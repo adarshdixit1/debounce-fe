@@ -19,20 +19,14 @@ function App() {
   }
 
   //debounce
-  const debounce = (func) => {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func.apply(this, args);
-      }, 2000);
+  useEffect(() => {
+    const delay = 800; 
+    const handler = setTimeout(() => {
+      getUsersData(search);
+    }, delay);
 
-    };
-  };
-
-  useEffect(()=>{
-    debounce(getUsersData)();
-  },[search]);
+    return () => clearTimeout(handler);
+  }, [search]);
 
 
   return (
