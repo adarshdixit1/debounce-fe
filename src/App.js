@@ -1,23 +1,53 @@
-import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
 
 function App() {
+
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const getUsersData=async()=>{
+    try {
+      const response = await fetch(`http://localhost:5000/search/users?search=${search}`);
+      if(response.status===200){
+        const data=await response.json();
+        setUsers(data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //debounce
+  const debounce = (func) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func.apply(this, args);
+      }, 2000);
+
+    };
+  };
+
+  useEffect(()=>{
+    debounce(getUsersData)();
+  },[search]);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <label style={{margin:"5px", padding:"5px"}}>Serach</label>
+        <input type="text" placeholder='search' onChange={(e)=> setSearch(e.target.value) }/>
+      </div>
+      <div style={{display:"flex", flexWrap:"wrap"}}>
+        {
+          users && users?.map((user,i)=><div key={i}
+            style={{border:"1px solid black", padding:"10px",margin:"10px"}}
+          >{user.name}</div>)
+        }
+      </div>
     </div>
   );
 }
